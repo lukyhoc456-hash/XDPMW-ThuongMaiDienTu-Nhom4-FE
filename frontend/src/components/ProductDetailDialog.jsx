@@ -1,0 +1,186 @@
+import React, { useMemo } from "react";
+
+function prettifyKey(key) {
+  const map = {
+    ram: "RAM",
+    storage: "Bộ nhớ",
+    color: "Màu sắc",
+    cpu: "CPU",
+    battery: "Pin",
+    connectivity: "Kết nối",
+    screen: "Màn hình",
+    camera: "Camera",
+  };
+  return map[key] || key.replaceAll("_", " ").replaceAll("-", " ");
+}
+
+function toDisplayValue(v) {
+  if (v === null || v === undefined) return "";
+  if (Array.isArray(v)) return v.join(", ");
+  if (typeof v === "object") return JSON.stringify(v);
+  return String(v);
+}
+
+export default function ProductDetailDialog({
+  open,
+  product,
+  onClose,
+  formatVND,
+  getImage,
+  getName,
+  getCategory,
+}) {
+  if (!open) return null;
+
+  const specsObj = useMemo(() => {
+    const s = product?.specifications;
+    if (!s) return null;
+
+    // nếu backend trả string JSON
+    if (typeof s === "string") {
+      try {
+        const parsed = JSON.parse(s);
+        return parsed && typeof parsed === "object" ? parsed : null;
+      } catch {
+        return null;
+      }
+    }
+
+    // nếu backend trả object
+    if (typeof s === "object") return s;
+
+    return null;
+  }, [product]);
+
+  const specsEntries = useMemo(() => {
+    if (!specsObj) return [];
+    return Object.entries(specsObj).filter(
+      ([k, v]) => v !== null && v !== undefined && String(v).trim() !== ""
+    );
+  }, [specsObj]);
+
+  return (
+    <>
+      <div className="modal-backdrop fade show" />
+
+      <div
+        className="modal fade show"
+        style={{ display: "block" }}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="modal-dialog modal-lg modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <div>
+                <h5 className="modal-title mb-0">{getName(product)}</h5>
+                <div className="text-muted small">{getCategory(product)}</div>
+              </div>
+
+              <button type="button" className="btn-close" onClick={onClose} />
+            </div>
+
+            <div className="modal-body">
+              <div className="row g-3">
+                <div className="col-md-5">
+                  <div className="ratio ratio-1x1 bg-light rounded border">
+                    <img
+                      src={getImage(product)}
+                      alt={getName(product)}
+                      className="w-100 h-100"
+                      style={{ objectFit: "contain", padding: 12 }}
+                      onError={(e) => {
+                        e.currentTarget.src = "/img/no-image.jpg";
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="col-md-7">
+                  <div className="mb-2 text-center">
+                    <div className="text-muted small">Giá</div>
+                    <div className="fs-3 fw-semibold text-primary">
+                      {formatVND(product?.price)}
+                    </div>
+                  </div>
+
+                  <div className="row text-center g-2 mb-2">
+                    <div className="col-6">
+                      <div className="text-muted small">Còn lại</div>
+                      <div className="fw-semibold">{product?.inventory ?? 0}</div>
+                    </div>
+                    <div className="col-6">
+                      <div className="text-muted small">Trạng thái</div>
+                      <span
+                        className={`badge ${
+                          product?.is_active
+                            ? "text-bg-success"
+                            : "text-bg-secondary"
+                        }`}
+                      >
+                        {product?.is_active ? "Đang bán" : "Ngừng bán"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {product?.description && (
+                    <div className="mt-3">
+                      <div className="text-muted small mb-1">Mô tả</div>
+                      <div className="border rounded p-2 bg-light" style={{ whiteSpace: "pre-wrap" }}>
+                        {product.description}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Specifications đẹp hơn */}
+                  {specsEntries.length > 0 && (
+                    <div className="mt-3">
+                      <div className="text-muted small mb-1">Thông số</div>
+                      <div className="table-responsive">
+                        <table className="table table-sm table-striped align-middle mb-0">
+                          <tbody>
+                            {specsEntries.map(([k, v]) => (
+                              <tr key={k}>
+                                <th style={{ width: "35%" }} className="text-nowrap">
+                                  {prettifyKey(k)}
+                                </th>
+                                <td>{toDisplayValue(v)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* nếu có specifications nhưng parse fail */}
+                  {!specsEntries.length && product?.specifications && (
+                    <div className="mt-3">
+                      <div className="text-muted small mb-1">Thông số</div>
+                      <div className="alert alert-secondary py-2 mb-0">
+                        Không đọc được định dạng thông số.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn btn-outline-secondary" onClick={onClose}>
+                Đóng
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => alert(`Thêm vào giỏ: ${getName(product)}`)}
+              >
+                Thêm giỏ
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
