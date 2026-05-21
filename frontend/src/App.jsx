@@ -1,19 +1,16 @@
-import './App.css'
-import Admin from './admin/Admin'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import AdminPage from './pages/AdminPage/AdminPage'
+import HomePage from './pages/HomePage/Homepage'
 
 function App() {
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <div>
-          <h1>XDPM Admin Dashboard</h1>
-          <p>Manage products and orders from one place.</p>
-        </div>
-      </header>
-      <main className="app-main">
-        <Admin />
-      </main>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   )
 }
 
