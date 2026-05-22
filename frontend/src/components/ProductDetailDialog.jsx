@@ -1,26 +1,5 @@
 import React, { useMemo } from "react";
 
-function prettifyKey(key) {
-  const map = {
-    ram: "RAM",
-    storage: "Bộ nhớ",
-    color: "Màu sắc",
-    cpu: "CPU",
-    battery: "Pin",
-    connectivity: "Kết nối",
-    screen: "Màn hình",
-    camera: "Camera",
-  };
-  return map[key] || key.replaceAll("_", " ").replaceAll("-", " ");
-}
-
-function toDisplayValue(v) {
-  if (v === null || v === undefined) return "";
-  if (Array.isArray(v)) return v.join(", ");
-  if (typeof v === "object") return JSON.stringify(v);
-  return String(v);
-}
-
 export default function ProductDetailDialog({
   open,
   product,
@@ -32,24 +11,39 @@ export default function ProductDetailDialog({
 }) {
   if (!open) return null;
 
+  // Hàm parse text specifications thành object để hiển thị dạng bảng
   const specsObj = useMemo(() => {
     const s = product?.specifications;
-    if (!s) return null;
+    if (!s || typeof s !== "string") return null;
 
-    // nếu backend trả string JSON
-    if (typeof s === "string") {
-      try {
-        const parsed = JSON.parse(s);
-        return parsed && typeof parsed === "object" ? parsed : null;
-      } catch {
-        return null;
-      }
+    const result = {};
+    const lines = s.split("\n");
+    
+    for (const line of lines) {
+      const colonIndex = line.indexOf(":");
+      if (colonIndex === -1) continue;
+      
+      const key = line.substring(0, colonIndex).trim().toLowerCase();
+      const value = line.substring(colonIndex + 1).trim();
+      
+      // Map key tiếng Việt sang key tiếng Anh để dùng prettifyKey
+      const keyMap = {
+        "cpu": "cpu",
+        "ram": "ram",
+        "bộ nhớ": "storage",
+        "bộ nhớ trong": "storage",
+        "màu sắc": "color",
+        "pin": "battery",
+        "kết nối": "connectivity",
+        "màn hình": "screen",
+        "camera": "camera",
+      };
+      
+      const mappedKey = keyMap[key] || key.replace(/\s+/g, "_");
+      result[mappedKey] = value;
     }
-
-    // nếu backend trả object
-    if (typeof s === "object") return s;
-
-    return null;
+    
+    return Object.keys(result).length > 0 ? result : null;
   }, [product]);
 
   const specsEntries = useMemo(() => {
@@ -58,6 +52,20 @@ export default function ProductDetailDialog({
       ([k, v]) => v !== null && v !== undefined && String(v).trim() !== ""
     );
   }, [specsObj]);
+
+  function prettifyKey(key) {
+    const map = {
+      ram: "RAM",
+      storage: "Bộ nhớ",
+      color: "Màu sắc",
+      cpu: "CPU",
+      battery: "Pin",
+      connectivity: "Kết nối",
+      screen: "Màn hình",
+      camera: "Camera",
+    };
+    return map[key] || key.replaceAll("_", " ").replaceAll("-", " ");
+  }
 
   return (
     <>
@@ -133,7 +141,7 @@ export default function ProductDetailDialog({
                     </div>
                   )}
 
-                  {/* Specifications đẹp hơn */}
+                  {/* Specifications hiển thị dạng bảng */}
                   {specsEntries.length > 0 && (
                     <div className="mt-3">
                       <div className="text-muted small mb-1">Thông số</div>
@@ -145,7 +153,7 @@ export default function ProductDetailDialog({
                                 <th style={{ width: "35%" }} className="text-nowrap">
                                   {prettifyKey(k)}
                                 </th>
-                                <td>{toDisplayValue(v)}</td>
+                                <td>{v}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -154,12 +162,12 @@ export default function ProductDetailDialog({
                     </div>
                   )}
 
-                  {/* nếu có specifications nhưng parse fail */}
+                  {/* Fallback: hiển thị text thuần nếu parse lỗi */}
                   {!specsEntries.length && product?.specifications && (
                     <div className="mt-3">
                       <div className="text-muted small mb-1">Thông số</div>
-                      <div className="alert alert-secondary py-2 mb-0">
-                        Không đọc được định dạng thông số.
+                      <div className="border rounded p-2 bg-light" style={{ whiteSpace: "pre-wrap" }}>
+                        {product.specifications}
                       </div>
                     </div>
                   )}
