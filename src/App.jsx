@@ -5,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import AdminPage from "./pages/AdminPage/AdminPage";
-import HomePage from "./pages/HomePage/Homepage";
+import HomePage from "./pages/HomePage/HomePage";
 import LoginPage from "./pages/Auth/LoginPage";
 import RegisterPage from "./pages/Auth/RegisterPage";
 import CartPage from "./pages/CartPage/CartPage";
