@@ -1,6 +1,21 @@
-import React from "react";
+import { useState, useEffect } from "react";
 
 export default function Header() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // Xóa token khỏi máy khách
+    setIsLoggedIn(false);
+    window.location.href = "/"; // Chuyển hướng về trang chủ
+  };
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container">
@@ -28,11 +43,25 @@ export default function Header() {
               </a>
             </li>
 
-            <li className="nav-item">
-              <a className="btn btn-outline-light ms-lg-2" href="/login">
-                Login
-              </a>
-            </li>
+            {/* 4. Dùng toán tử ba ngôi để điều kiện hiển thị nút */}
+            {!isLoggedIn ? (
+              // Nút LOGIN hiển thị khi CHƯA ĐĂNG NHẬP (isLoggedIn === false)
+              <li className="nav-item">
+                <a className="btn btn-outline-light ms-lg-2" href="/login">
+                  Login
+                </a>
+              </li>
+            ) : (
+              // Nút LOGOUT hiển thị khi ĐÃ ĐĂNG NHẬP (isLoggedIn === true)
+              <li className="nav-item">
+                <button
+                  className="btn btn-danger ms-lg-2"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       </div>
