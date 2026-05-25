@@ -7,7 +7,7 @@ export default function CartPage() {
   // 1. Cấu hình chung cho API
   // Tùy theo code login của bác lưu token tên gì thì đổi ở đây nhé (VD: "token" hoặc "access_token")
   const token = localStorage.getItem("token");
-  //const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  //const API_URL  || "http://localhost:8000";
   const API_URL = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
   // Sửa lại cổng nếu FastAPI của bác chạy cổng khác
 
