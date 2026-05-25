@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000'
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://xdpmw-thuongmaidientu-nhom4-be.onrender.com'
 const makeApiUrl = path => `${API_BASE.replace(/\/$/, '')}${path}`
 const statusList = ['pending', 'processing', 'shipped', 'completed', 'cancelled']
 
@@ -165,56 +165,56 @@ export default function Orders({ token }) {
   return (
     <div>
       <h3>Orders</h3>
-      {message && <div style={{marginBottom:12, color: message.includes('thành công') ? 'green' : 'red'}}>{message}</div>}
-      <div style={{display:'grid', gridTemplateColumns:'1.5fr 1fr', gap:20}}>
-        <div style={{padding:12, border:'1px solid #ddd', borderRadius:6}}>
+      {message && <div style={{ marginBottom: 12, color: message.includes('thành công') ? 'green' : 'red' }}>{message}</div>}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: 20 }}>
+        <div style={{ padding: 12, border: '1px solid #ddd', borderRadius: 6 }}>
           <h4>Tạo đơn hàng mới</h4>
-          <label style={{display:'block', marginBottom:10}}>
+          <label style={{ display: 'block', marginBottom: 10 }}>
             Tên khách hàng
-            <input value={orderForm.customer_name} onChange={e => setOrderForm({...orderForm, customer_name:e.target.value})} style={{width:'100%', padding:6}} />
+            <input value={orderForm.customer_name} onChange={e => setOrderForm({ ...orderForm, customer_name: e.target.value })} style={{ width: '100%', padding: 6 }} />
           </label>
-          <label style={{display:'block', marginBottom:10}}>
+          <label style={{ display: 'block', marginBottom: 10 }}>
             Email
-            <input value={orderForm.customer_email} onChange={e => setOrderForm({...orderForm, customer_email:e.target.value})} style={{width:'100%', padding:6}} />
+            <input value={orderForm.customer_email} onChange={e => setOrderForm({ ...orderForm, customer_email: e.target.value })} style={{ width: '100%', padding: 6 }} />
           </label>
-          <label style={{display:'block', marginBottom:10}}>
+          <label style={{ display: 'block', marginBottom: 10 }}>
             Phone
-            <input value={orderForm.customer_phone} onChange={e => setOrderForm({...orderForm, customer_phone:e.target.value})} style={{width:'100%', padding:6}} />
+            <input value={orderForm.customer_phone} onChange={e => setOrderForm({ ...orderForm, customer_phone: e.target.value })} style={{ width: '100%', padding: 6 }} />
           </label>
-          <label style={{display:'block', marginBottom:10}}>
+          <label style={{ display: 'block', marginBottom: 10 }}>
             Shipping address
-            <input value={orderForm.shipping_address} onChange={e => setOrderForm({...orderForm, shipping_address:e.target.value})} style={{width:'100%', padding:6}} />
+            <input value={orderForm.shipping_address} onChange={e => setOrderForm({ ...orderForm, shipping_address: e.target.value })} style={{ width: '100%', padding: 6 }} />
           </label>
-          <label style={{display:'block', marginBottom:10}}>
+          <label style={{ display: 'block', marginBottom: 10 }}>
             Notes
-            <textarea value={orderForm.notes} onChange={e => setOrderForm({...orderForm, notes:e.target.value})} style={{width:'100%', padding:6}} rows={3} />
+            <textarea value={orderForm.notes} onChange={e => setOrderForm({ ...orderForm, notes: e.target.value })} style={{ width: '100%', padding: 6 }} rows={3} />
           </label>
           <div>
             <h5>Items</h5>
             {orderForm.items.map((item, index) => (
-              <div key={index} style={{display:'grid', gridTemplateColumns:'2fr 1fr auto', gap:10, marginBottom:8}}>
-                <select value={item.product_id} onChange={e => updateItem(index, 'product_id', e.target.value)} style={{padding:6}}>
+              <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr auto', gap: 10, marginBottom: 8 }}>
+                <select value={item.product_id} onChange={e => updateItem(index, 'product_id', e.target.value)} style={{ padding: 6 }}>
                   <option value="">Chọn sản phẩm</option>
                   {products.map(p => (
                     <option key={p.id} value={p.id}>{p.name || `#${p.id}`}</option>
                   ))}
                 </select>
-                <input type="number" placeholder="Qty" min={1} value={item.quantity} onChange={e => updateItem(index, 'quantity', e.target.value)} style={{padding:6}} />
+                <input type="number" placeholder="Qty" min={1} value={item.quantity} onChange={e => updateItem(index, 'quantity', e.target.value)} style={{ padding: 6 }} />
                 <button type="button" onClick={() => removeItem(index)}>Remove</button>
               </div>
             ))}
             <button onClick={addItem} type="button">Add item</button>
           </div>
-          <div style={{marginTop:12}}>
+          <div style={{ marginTop: 12 }}>
             <button onClick={createOrder} disabled={saving}>{saving ? 'Đang tạo...' : 'Tạo đơn hàng'}</button>
           </div>
         </div>
 
         <div>
           {loading ? (<div>Loading...</div>) : (
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{background:'#fafafa'}}>
+                <tr style={{ background: '#fafafa' }}>
                   <th>ID</th>
                   <th>Customer</th>
                   <th>Phone</th>
@@ -225,7 +225,7 @@ export default function Orders({ token }) {
               </thead>
               <tbody>
                 {orders.map(o => (
-                  <tr key={o.id} style={{borderTop:'1px solid #eee'}}>
+                  <tr key={o.id} style={{ borderTop: '1px solid #eee' }}>
                     <td>{o.id}</td>
                     <td>{o.customer_name}</td>
                     <td>{o.customer_phone || '-'}</td>
@@ -240,8 +240,8 @@ export default function Orders({ token }) {
         </div>
       </div>
 
-      <div style={{marginTop:20, display:'grid', gridTemplateColumns:'1fr 1fr', gap:20}}>
-        <div style={{padding:12, border:'1px solid #ddd', borderRadius:6}}>
+      <div style={{ marginTop: 20, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+        <div style={{ padding: 12, border: '1px solid #ddd', borderRadius: 6 }}>
           {selected ? (
             <>
               <h4>Order #{selected.id}</h4>
@@ -252,17 +252,17 @@ export default function Orders({ token }) {
               <p><b>Notes:</b> {selected.notes || '-'}</p>
               <p><b>Status:</b> {selected.status}</p>
               <p><b>Total:</b> {selected.total_price}</p>
-              <label style={{display:'block', marginBottom:10}}>
+              <label style={{ display: 'block', marginBottom: 10 }}>
                 Cập nhật trạng thái
-                <select value={status} onChange={e => setStatus(e.target.value)} style={{width:'100%', padding:6}}>
+                <select value={status} onChange={e => setStatus(e.target.value)} style={{ width: '100%', padding: 6 }}>
                   {statusList.map(value => <option value={value} key={value}>{value}</option>)}
                 </select>
               </label>
               <button onClick={updateStatus} disabled={saving}>{saving ? 'Updating...' : 'Update status'}</button>
-              <h5 style={{marginTop:16}}>Items</h5>
-              <table style={{width:'100%',borderCollapse:'collapse'}}>
+              <h5 style={{ marginTop: 16 }}>Items</h5>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr style={{background:'#f0f0f0'}}>
+                  <tr style={{ background: '#f0f0f0' }}>
                     <th>Product</th>
                     <th>Qty</th>
                     <th>Unit Price</th>
@@ -270,7 +270,7 @@ export default function Orders({ token }) {
                 </thead>
                 <tbody>
                   {(selected.items || []).map((it, idx) => (
-                    <tr key={idx} style={{borderTop:'1px solid #eee'}}>
+                    <tr key={idx} style={{ borderTop: '1px solid #eee' }}>
                       <td>{it.product_name || it.product_id}</td>
                       <td>{it.quantity}</td>
                       <td>{it.unit_price}</td>
