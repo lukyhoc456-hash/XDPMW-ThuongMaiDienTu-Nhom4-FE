@@ -28,6 +28,44 @@ export default function HomePage() {
     closeDetail,
   } = useHomePage();
 
+  const handleAddToCart = async (product) => {
+    const token = localStorage.getItem("token");
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+    if (token) {
+      try {
+        const response = await fetch(`${API_URL}/cart/add`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ product_id: product.id ?? product._id, quantity: 1 }),
+        });
+        if (response.ok) {
+          window.dispatchEvent(new Event("cart-updated"));
+          alert(`Đã thêm ${getName(product)} vào giỏ hàng`);
+        } else {
+          alert("Lỗi khi thêm vào giỏ hàng trên hệ thống!");
+        }
+      } catch (error) {
+        console.error("Lỗi thêm giỏ hàng:", error);
+      }
+    } else {
+      let localCart = JSON.parse(localStorage.getItem("local_cart")) || [];
+      const pId = product.id ?? product._id;
+      const itemIndex = localCart.findIndex((i) => i.product_id === pId);
+      if (itemIndex > -1) {
+        localCart[itemIndex].quantity += 1;
+      } else {
+        localCart.push({ product_id: pId, quantity: 1, product: product });
+      }
+      localStorage.setItem("local_cart", JSON.stringify(localCart));
+      window.dispatchEvent(new Event("cart-updated"));
+      alert(`Đã thêm ${getName(product)} vào giỏ hàng`);
+    }
+  };
+
   return (
     <>
       <Header />
@@ -198,7 +236,7 @@ export default function HomePage() {
                       </button>
                       <button
                         className="btn btn-primary w-100"
-                        onClick={() => alert(`Thêm vào giỏ: ${getName(p)}`)}
+                        onClick={() => handleAddToCart(p)}
                       >
                         Thêm giỏ
                       </button>
@@ -225,6 +263,7 @@ export default function HomePage() {
         getImage={getImage}
         getName={getName}
         getCategory={getCategory}
+        onAddToCart={handleAddToCart}
       />
     </>
   );

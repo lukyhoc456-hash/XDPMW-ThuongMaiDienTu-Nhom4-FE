@@ -1,6 +1,27 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 export default function Header() {
+
+  const [cartCount, setCartCount] = useState(0);
+
+  const updateCartCount = () => {
+    const localCart = JSON.parse(localStorage.getItem("local_cart")) || [];
+    const totalItems = localCart.reduce((total, item) => total + (item.quantity || 0), 0);
+    setCartCount(totalItems);
+  };
+
+  useEffect(() => {
+    // Chạy lần đầu khi load trang
+    updateCartCount();
+
+    window.addEventListener("cart-updated", updateCartCount);
+
+    // Clean up event listener
+    return () => {
+      window.removeEventListener("cart-updated", updateCartCount);
+    };
+  }, []);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -42,6 +63,17 @@ export default function Header() {
                 Home
               </a>
             </li>
+            <li className="nav-item">
+            <Link to="/cart" className="nav-link position-relative d-inline-flex align-items-center px-2">
+              <span style={{ fontSize: "1.25rem" }}>🛒</span>
+              {cartCount > 0 && (
+                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  {cartCount}
+                  <span className="visually-hidden">Sản phẩm trong giỏ</span>
+                </span>
+              )}
+            </Link>
+          </li>
 
             {/* 4. Dùng toán tử ba ngôi để điều kiện hiển thị nút */}
             {!isLoggedIn ? (

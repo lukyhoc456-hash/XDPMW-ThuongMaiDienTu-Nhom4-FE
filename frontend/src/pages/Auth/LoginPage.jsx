@@ -18,24 +18,31 @@ const LoginPage = () => {
     });
   };
 
-  // 3. Hàm xử lý khi người dùng nhấn nút Đăng Nhập
+// 3. Hàm xử lý khi người dùng nhấn nút Đăng Nhập
   const handleSubmit = (e) => {
-    e.preventDefault(); // Chặn việc reload lại trang mặc định của form
-    console.log("Dữ liệu gửi lên Backend FastAPI:", formData);
+    e.preventDefault();
+    console.log("Dữ liệu chuẩn bị gửi:", formData);
 
-    // TODO: Thêm logic gọi API (fetch hoặc axios) tới Backend ở đây
+    // GỌI API GỬI THẲNG JSON LUÔN (Không dùng URLSearchParams hay FormData gì sất)
     axios
       .post("http://localhost:8000/login", formData)
       .then((response) => {
         console.log("Đăng nhập thành công:", response.data);
-        // Lưu token vào localStorage để giữ trạng thái đăng nhập
-        localStorage.setItem("token", response.data.token);
-        window.location.href = "/"; // Xử lý kết quả thành công, ví dụ: chuyển hướng đến trang chủ
-        // Xử lý kết quả thành công, ví dụ: chuyển hướng đến trang chủ
+        
+        // Tùy theo API trả về, token có thể nằm ở response.data hoặc response.data.data
+        const token = response.data.access_token || response.data.data?.access_token || response.data.token;
+        
+        if(token) {
+            localStorage.setItem("token", token);
+            window.location.href = "/"; // Về trang chủ
+        } else {
+            alert("Đăng nhập thành công nhưng không tìm thấy Token!");
+        }
       })
       .catch((error) => {
         console.error("Lỗi khi đăng nhập:", error);
-        // Xử lý lỗi, ví dụ: hiển thị thông báo lỗi cho người dùng
+        // Nếu ra lỗi 400 ở đây nghĩa là SAI TÀI KHOẢN / MẬT KHẨU
+        alert("Sai tài khoản hoặc mật khẩu. Bác check lại xem tk đã đăng ký chưa nhé!");
       });
   };
 
@@ -43,16 +50,13 @@ const LoginPage = () => {
     <div
       style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
-      {/* Giữ nguyên Header của bạn ở trên cùng */}
       <Header />
 
-      {/* Phần thân chứa Form đăng nhập */}
       <div style={styles.pageBody}>
         <div style={styles.loginContainer}>
           <h2 style={styles.title}>Đăng Nhập</h2>
 
           <form onSubmit={handleSubmit}>
-            {/* Ô nhập Tài khoản */}
             <div style={styles.inputGroup}>
               <label style={styles.label} htmlFor="username">
                 Tài khoản hoặc Email
@@ -69,7 +73,6 @@ const LoginPage = () => {
               />
             </div>
 
-            {/* Ô nhập Mật khẩu */}
             <div style={styles.inputGroup}>
               <label style={styles.label} htmlFor="password">
                 Mật khẩu
@@ -86,13 +89,11 @@ const LoginPage = () => {
               />
             </div>
 
-            {/* Nút Đăng nhập */}
             <button style={styles.btnLogin} type="submit">
               Đăng nhập
             </button>
           </form>
 
-          {/* Liên kết mở rộng */}
           <div style={styles.formFooter}>
             <p>
               Chưa có tài khoản?{" "}
@@ -107,7 +108,6 @@ const LoginPage = () => {
   );
 };
 
-// 4. Định nghĩa Inline Styles để gom gọn trong một file (Bạn có thể tách ra file .css riêng nếu muốn)
 const styles = {
   pageBody: {
     flex: 1,

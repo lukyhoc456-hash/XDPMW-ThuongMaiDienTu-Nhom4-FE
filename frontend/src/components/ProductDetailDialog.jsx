@@ -8,13 +8,18 @@ export default function ProductDetailDialog({
   getImage,
   getName,
   getCategory,
+  onAddToCart,
 }) {
   if (!open) return null;
 
   // Hàm parse text specifications thành object để hiển thị dạng bảng
   const specsObj = useMemo(() => {
     const s = product?.specifications;
-    if (!s || typeof s !== "string") return null;
+    if (!s) return null;
+
+    if (typeof s === "object") return s;
+
+    if (typeof s !== "string") return null;
 
     const result = {};
     const lines = s.split("\n");
@@ -167,7 +172,9 @@ export default function ProductDetailDialog({
                     <div className="mt-3">
                       <div className="text-muted small mb-1">Thông số</div>
                       <div className="border rounded p-2 bg-light" style={{ whiteSpace: "pre-wrap" }}>
-                        {product.specifications}
+                        {typeof product.specifications === "object"
+                          ? JSON.stringify(product.specifications, null, 2)
+                          : product.specifications}
                       </div>
                     </div>
                   )}
@@ -181,7 +188,10 @@ export default function ProductDetailDialog({
               </button>
               <button
                 className="btn btn-primary"
-                onClick={() => alert(`Thêm vào giỏ: ${getName(product)}`)}
+                onClick={() => {
+                  if (onAddToCart) onAddToCart(product);
+                  else alert(`Thêm vào giỏ: ${getName(product)}`);
+                }}
               >
                 Thêm giỏ
               </button>
