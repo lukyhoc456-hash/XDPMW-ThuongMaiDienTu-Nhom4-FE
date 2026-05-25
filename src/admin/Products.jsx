@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000'
+//const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000'
+const API_BASE = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
 const makeApiUrl = path => `${API_BASE.replace(/\/$/, '')}${path}`
 
 const blankProduct = {
@@ -157,63 +158,63 @@ export default function Products({ token }) {
   return (
     <div>
       <h3>Products</h3>
-      {message && <div style={{marginBottom:12, color: message.includes('thành công') ? 'green' : 'red'}}>{message}</div>}
-      <div style={{display:'flex', gap:20, flexWrap:'wrap'}}>
-        <div style={{flex:1, minWidth:320}}>
-          <div style={{marginBottom:12, padding:12, border:'1px solid #ddd', borderRadius:6}}>
+      {message && <div style={{ marginBottom: 12, color: message.includes('thành công') ? 'green' : 'red' }}>{message}</div>}
+      <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: 320 }}>
+          <div style={{ marginBottom: 12, padding: 12, border: '1px solid #ddd', borderRadius: 6 }}>
             <h4>{selected.id ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm mới'}</h4>
-            <label style={{display:'block', marginBottom:8}}>
+            <label style={{ display: 'block', marginBottom: 8 }}>
               Tên sản phẩm
-              <input value={selected.name} onChange={e => setSelected({...selected, name:e.target.value})} style={{width:'100%', padding:6}} />
+              <input value={selected.name} onChange={e => setSelected({ ...selected, name: e.target.value })} style={{ width: '100%', padding: 6 }} />
             </label>
-            <label style={{display:'block', marginBottom:8}}>
+            <label style={{ display: 'block', marginBottom: 8 }}>
               Danh mục
-              <input value={selected.category} onChange={e => setSelected({...selected, category:e.target.value})} style={{width:'100%', padding:6}} />
+              <input value={selected.category} onChange={e => setSelected({ ...selected, category: e.target.value })} style={{ width: '100%', padding: 6 }} />
             </label>
-            <label style={{display:'block', marginBottom:8}}>
+            <label style={{ display: 'block', marginBottom: 8 }}>
               Mô tả
-              <textarea value={selected.description} onChange={e => setSelected({...selected, description:e.target.value})} rows={3} style={{width:'100%', padding:6}} />
+              <textarea value={selected.description} onChange={e => setSelected({ ...selected, description: e.target.value })} rows={3} style={{ width: '100%', padding: 6 }} />
             </label>
-            <label style={{display:'block', marginBottom:8}}>
+            <label style={{ display: 'block', marginBottom: 8 }}>
               Upload ảnh sản phẩm
-              <input type='file' accept='image/*' onChange={handleImageFileChange} style={{width:'100%', padding:6}} />
-              {imageUploading && <div style={{marginTop:8}}>Đang upload ảnh...</div>}
+              <input type='file' accept='image/*' onChange={handleImageFileChange} style={{ width: '100%', padding: 6 }} />
+              {imageUploading && <div style={{ marginTop: 8 }}>Đang upload ảnh...</div>}
             </label>
             {selected.image_url && (
-              <div style={{marginBottom:8}}>
-                <img src={getImageUrl(selected.image_url)} alt='Preview' style={{maxWidth:'100%', maxHeight:220, border:'1px solid #ddd', borderRadius:6}} />
+              <div style={{ marginBottom: 8 }}>
+                <img src={getImageUrl(selected.image_url)} alt='Preview' style={{ maxWidth: '100%', maxHeight: 220, border: '1px solid #ddd', borderRadius: 6 }} />
               </div>
             )}
-            <label style={{display:'block', marginBottom:8}}>
+            <label style={{ display: 'block', marginBottom: 8 }}>
               Specifications
-              <textarea value={selected.specifications} onChange={e => setSelected({...selected, specifications:e.target.value})} rows={4} style={{width:'100%', padding:6}} />
+              <textarea value={selected.specifications} onChange={e => setSelected({ ...selected, specifications: e.target.value })} rows={4} style={{ width: '100%', padding: 6 }} />
             </label>
-            <label style={{display:'block', marginBottom:8}}>
+            <label style={{ display: 'block', marginBottom: 8 }}>
               Giá
-              <input type="number" value={selected.price} onChange={e => setSelected({...selected, price:e.target.value})} style={{width:'100%', padding:6}} />
+              <input type="number" value={selected.price} onChange={e => setSelected({ ...selected, price: e.target.value })} style={{ width: '100%', padding: 6 }} />
             </label>
-            <label style={{display:'block', marginBottom:8}}>
+            <label style={{ display: 'block', marginBottom: 8 }}>
               Inventory
-              <input type="number" value={selected.inventory} onChange={e => setSelected({...selected, inventory:e.target.value})} style={{width:'100%', padding:6}} />
+              <input type="number" value={selected.inventory} onChange={e => setSelected({ ...selected, inventory: e.target.value })} style={{ width: '100%', padding: 6 }} />
             </label>
-            <label style={{display:'block', marginBottom:8}}>
+            <label style={{ display: 'block', marginBottom: 8 }}>
               Active
-              <select value={selected.is_active} onChange={e => setSelected({...selected, is_active:e.target.value === 'true'})} style={{width:'100%', padding:6}}>
+              <select value={selected.is_active} onChange={e => setSelected({ ...selected, is_active: e.target.value === 'true' })} style={{ width: '100%', padding: 6 }}>
                 <option value={true}>True</option>
                 <option value={false}>False</option>
               </select>
             </label>
-            <div style={{display:'flex', gap:10}}>
+            <div style={{ display: 'flex', gap: 10 }}>
               <button onClick={saveProduct} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</button>
               <button onClick={clearForm} type="button">Reset</button>
             </div>
           </div>
         </div>
-        <div style={{flex:2, minWidth:400}}>
+        <div style={{ flex: 2, minWidth: 400 }}>
           {loading ? <div>Loading...</div> : (
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
-                <tr style={{background:'#fafafa'}}>
+                <tr style={{ background: '#fafafa' }}>
                   <th>ID</th>
                   <th>Name</th>
                   <th>Image</th>
@@ -226,12 +227,12 @@ export default function Products({ token }) {
               </thead>
               <tbody>
                 {products.map(p => (
-                  <tr key={p.id} style={{borderTop:'1px solid #eee'}}>
+                  <tr key={p.id} style={{ borderTop: '1px solid #eee' }}>
                     <td>{p.id}</td>
                     <td>{p.name}</td>
-                    <td style={{padding:4}}>
+                    <td style={{ padding: 4 }}>
                       {p.image_url ? (
-                        <img src={getImageUrl(p.image_url)} alt={p.name} style={{width:60, height:60, objectFit:'cover', borderRadius:6}} />
+                        <img src={getImageUrl(p.image_url)} alt={p.name} style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 6 }} />
                       ) : '-'}
                     </td>
                     <td>{p.category || '-'}</td>
@@ -239,7 +240,7 @@ export default function Products({ token }) {
                     <td>{p.inventory}</td>
                     <td>{String(p.is_active)}</td>
                     <td>
-                      <button onClick={() => startEdit(p)} style={{marginRight:6}}>Edit</button>
+                      <button onClick={() => startEdit(p)} style={{ marginRight: 6 }}>Edit</button>
                       <button onClick={() => deleteProduct(p.id)}>Delete</button>
                     </td>
                   </tr>

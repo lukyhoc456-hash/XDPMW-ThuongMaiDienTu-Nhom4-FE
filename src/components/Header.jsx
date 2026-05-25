@@ -5,10 +5,33 @@ export default function Header() {
 
   const [cartCount, setCartCount] = useState(0);
 
-  const updateCartCount = () => {
-    const localCart = JSON.parse(localStorage.getItem("local_cart")) || [];
-    const totalItems = localCart.reduce((total, item) => total + (item.quantity || 0), 0);
-    setCartCount(totalItems);
+  const updateCartCount = async () => {
+    const token = localStorage.getItem("token");
+    // const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+    const API_URL = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
+    if (token) {
+      // --- ĐÃ ĐĂNG NHẬP: Gọi API lấy giỏ hàng từ DB ---
+      try {
+        const response = await fetch(`${API_URL}/cart`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (response.ok) {
+          const resData = await response.json();
+          const items = resData.data?.items || [];
+          const totalItems = items.reduce((total, item) => total + (item.quantity || 0), 0);
+          setCartCount(totalItems);
+        }
+      } catch (error) {
+        console.error("Lỗi lấy số lượng giỏ hàng từ DB:", error);
+      }
+    } else {
+      const localCart = JSON.parse(localStorage.getItem("local_cart")) || [];
+      const totalItems = localCart.reduce((total, item) => total + (item.quantity || 0), 0);
+      setCartCount(totalItems);
+    }
   };
 
   useEffect(() => {
@@ -64,16 +87,16 @@ export default function Header() {
               </a>
             </li>
             <li className="nav-item">
-            <Link to="/cart" className="nav-link position-relative d-inline-flex align-items-center px-2">
-              <span style={{ fontSize: "1.25rem" }}>🛒</span>
-              {cartCount > 0 && (
-                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                  {cartCount}
-                  <span className="visually-hidden">Sản phẩm trong giỏ</span>
-                </span>
-              )}
-            </Link>
-          </li>
+              <Link to="/cart" className="nav-link position-relative d-inline-flex align-items-center px-2">
+                <span style={{ fontSize: "1.25rem" }}>🛒</span>
+                {cartCount > 0 && (
+                  <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {cartCount}
+                    <span className="visually-hidden">Sản phẩm trong giỏ</span>
+                  </span>
+                )}
+              </Link>
+            </li>
 
             {/* 4. Dùng toán tử ba ngôi để điều kiện hiển thị nút */}
             {!isLoggedIn ? (

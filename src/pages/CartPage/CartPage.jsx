@@ -6,8 +6,10 @@ export default function CartPage() {
 
   // 1. Cấu hình chung cho API
   // Tùy theo code login của bác lưu token tên gì thì đổi ở đây nhé (VD: "token" hoặc "access_token")
-  const token = localStorage.getItem("token"); 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"; // Sửa lại cổng nếu FastAPI của bác chạy cổng khác
+  const token = localStorage.getItem("token");
+  //const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  const API_URL = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
+  // Sửa lại cổng nếu FastAPI của bác chạy cổng khác
 
   // 2. LẤY DỮ LIỆU GIỎ HÀNG
   const loadCart = async () => {
@@ -42,7 +44,7 @@ export default function CartPage() {
   // 3. THAY ĐỔI SỐ LƯỢNG (+1 / -1)
   const handleQuantityChange = async (productId, currentQty, change) => {
     const newQty = currentQty + change;
-    if (newQty < 1) return; 
+    if (newQty < 1) return;
 
     if (token) {
       // --- ĐÃ ĐĂNG NHẬP: Cập nhật vào DB ---
@@ -108,7 +110,7 @@ export default function CartPage() {
       // --- CHƯA ĐĂNG NHẬP: Xóa ở LocalStorage ---
       let localCart = JSON.parse(localStorage.getItem("local_cart")) || [];
       localCart = localCart.filter((i) => i.product_id !== productId);
-      
+
       localStorage.setItem("local_cart", JSON.stringify(localCart));
       setCartItems(localCart);
       window.dispatchEvent(new Event("cart-updated"));
@@ -140,8 +142,8 @@ export default function CartPage() {
             <div className="col-lg-8">
               <div className="card shadow-sm p-3">
                 {cartItems.map((item, index) => (
-                  <div 
-                    key={item.product_id} 
+                  <div
+                    key={item.product_id}
                     className={`row align-items-center g-3 py-3 ${index !== cartItems.length - 1 ? "border-bottom" : ""}`}
                   >
                     <div className="col-3 col-md-2">
@@ -205,7 +207,7 @@ export default function CartPage() {
                   <span className="fw-bold text-dark">Tổng tiền:</span>
                   <span className="fs-4 fw-bold text-danger">{formatVND(tongTienGio())}</span>
                 </div>
-                <button 
+                <button
                   className="btn btn-success w-100 py-2 fw-bold text-uppercase shadow-sm"
                   onClick={() => alert(`Chuẩn bị chuyển hướng sang trang điền thông tin đặt hàng!`)}
                 >
