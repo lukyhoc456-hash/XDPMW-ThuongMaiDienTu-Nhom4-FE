@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../../components/Header";
-import { useHomePage } from "./Homepage.hook";
+import { useHomePage } from "./HomePage.hook";
 import ProductDetailDialog from "../../components/ProductDetailDialog";
 
 export default function HomePage() {
