@@ -1,7 +1,9 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
+
 
 export const getProducts = async () => {
-  const response = await fetch(`${API_BASE_URL}/products`);
+  const response = await fetch(`${API_BASE}/products`);
   if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
   const jsonResult = await response.json();
   return jsonResult.data;
@@ -9,7 +11,7 @@ export const getProducts = async () => {
 
 export const getProduct = async (id) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products/${id}`);
+      const response = await fetch(`${API_BASE}/products/${id}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       
       const jsonResult = await response.json();
@@ -21,7 +23,7 @@ export const getProduct = async (id) => {
   };
 export const createProduct = async (productData) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/products`, {
+        const response = await fetch(`${API_BASE}/products`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -40,7 +42,7 @@ export const createProduct = async (productData) => {
 
 export const updateProduct = async (id, productData) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+        const response = await fetch(`${API_BASE}/products/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -59,7 +61,7 @@ export const updateProduct = async (id, productData) => {
 
 export const deleteProduct = async (id) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+        const response = await fetch(`${API_BASE}/products/${id}`, {
             method: 'DELETE',
         });
         if (!response.ok) {
