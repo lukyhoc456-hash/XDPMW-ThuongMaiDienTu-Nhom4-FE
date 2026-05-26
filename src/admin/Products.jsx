@@ -68,6 +68,11 @@ export default function Products({ token }) {
   }
 
   const validateProduct = () => {
+    if (imageUploading) {
+      setMessage('Vui lòng chờ upload ảnh hoàn tất trước khi lưu sản phẩm.')
+      return false
+    }
+
     const requiredFields = [
       { value: selected.name, label: 'Tên sản phẩm' },
       { value: selected.category, label: 'Danh mục' },
@@ -399,7 +404,7 @@ export default function Products({ token }) {
               </div>
 
               <div className="d-flex gap-2 flex-wrap">
-                <button className="btn btn-success flex-grow-1" onClick={saveProduct} disabled={saving}>
+                <button className="btn btn-success flex-grow-1" onClick={saveProduct} disabled={saving || imageUploading}>
                   {saving ? 'Đang lưu...' : 'Lưu'}
                 </button>
                 <button className="btn btn-outline-secondary flex-grow-1" onClick={clearForm} type="button">
