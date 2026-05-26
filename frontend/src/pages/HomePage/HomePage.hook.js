@@ -13,6 +13,8 @@ export function useHomePage() {
   const [errorMsg, setErrorMsg] = useState("");
 
   const [query, setQuery] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState("default");
 
@@ -90,6 +92,16 @@ export function useHomePage() {
       );
     }
 
+    const min = parseFloat(minPrice);
+    const max = parseFloat(maxPrice);
+
+    if (!Number.isNaN(min)) {
+      list = list.filter((p) => Number(p.price ?? p.unit_price ?? p.gia ?? p.cost ?? 0) >= min);
+    }
+    if (!Number.isNaN(max)) {
+      list = list.filter((p) => Number(p.price ?? p.unit_price ?? p.gia ?? p.cost ?? 0) <= max);
+    }
+
     // sort price
     const getPrice = (p) =>
       Number(p.price ?? p.unit_price ?? p.gia ?? p.cost ?? 0);
@@ -151,6 +163,10 @@ export function useHomePage() {
     // filters
     query,
     setQuery,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
     category,
     setCategory,
     sort,

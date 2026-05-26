@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000'
 const makeApiUrl = path => `${API_BASE.replace(/\/$/, '')}${path}`
@@ -22,19 +22,25 @@ export default function Products({ token }) {
   const [message, setMessage] = useState('')
   const [saving, setSaving] = useState(false)
   const [imageUploading, setImageUploading] = useState(false)
+  const [searchName, setSearchName] = useState('')
+  const [minPrice, setMinPrice] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
 
   const headers = {
     'Content-Type': 'application/json',
     ...(token ? { Authorization: `Bearer ${token}` } : {})
   }
 
-  const loadProducts = async () => {
+  const loadProducts = async ({ minPrice: filterMinPrice = minPrice, maxPrice: filterMaxPrice = maxPrice } = {}) => {
     setLoading(true)
     try {
-      const url = makeApiUrl('/products?page=1&page_size=100')
+      let url = makeApiUrl('/products?page=1&page_size=100')
+      if (filterMinPrice !== '') url += `&min_price=${encodeURIComponent(filterMinPrice)}`
+      if (filterMaxPrice !== '') url += `&max_price=${encodeURIComponent(filterMaxPrice)}`
       const response = await fetch(url)
       const json = await response.json()
       const items = json.items || json.data || (json.data && json.data.data) || []
+      console.log(items)
       setProducts(items)
     } catch (err) {
       console.error(err)
@@ -121,6 +127,30 @@ export default function Products({ token }) {
     return `${prefix}${url}`
   }
 
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const name = String(product.name || product.title || product.ten || product.description || '')
+        .toLowerCase()
+      const price = Number(product.price ?? product.unit_price ?? product.gia ?? product.cost ?? 0)
+
+      if (searchName.trim()) {
+        if (!name.includes(searchName.trim().toLowerCase())) return false
+      }
+
+      if (minPrice !== '') {
+        const min = Number(minPrice)
+        if (!Number.isNaN(min) && price < min) return false
+      }
+
+      if (maxPrice !== '') {
+        const max = Number(maxPrice)
+        if (!Number.isNaN(max) && price > max) return false
+      }
+
+      return true
+    })
+  }, [products, searchName, minPrice, maxPrice])
+
   const uploadImage = async file => {
     if (!file) return
     setImageUploading(true)
@@ -155,98 +185,257 @@ export default function Products({ token }) {
   }
 
   return (
-    <div>
-      <h3>Products</h3>
-      {message && <div style={{marginBottom:12, color: message.includes('thành công') ? 'green' : 'red'}}>{message}</div>}
-      <div style={{display:'flex', gap:20, flexWrap:'wrap'}}>
-        <div style={{flex:1, minWidth:320}}>
-          <div style={{marginBottom:12, padding:12, border:'1px solid #ddd', borderRadius:6}}>
-            <h4>{selected.id ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm mới'}</h4>
-            <label style={{display:'block', marginBottom:8}}>
-              Tên sản phẩm
-              <input value={selected.name} onChange={e => setSelected({...selected, name:e.target.value})} style={{width:'100%', padding:6}} />
-            </label>
-            <label style={{display:'block', marginBottom:8}}>
-              Danh mục
-              <input value={selected.category} onChange={e => setSelected({...selected, category:e.target.value})} style={{width:'100%', padding:6}} />
-            </label>
-            <label style={{display:'block', marginBottom:8}}>
-              Mô tả
-              <textarea value={selected.description} onChange={e => setSelected({...selected, description:e.target.value})} rows={3} style={{width:'100%', padding:6}} />
-            </label>
-            <label style={{display:'block', marginBottom:8}}>
-              Upload ảnh sản phẩm
-              <input type='file' accept='image/*' onChange={handleImageFileChange} style={{width:'100%', padding:6}} />
-              {imageUploading && <div style={{marginTop:8}}>Đang upload ảnh...</div>}
-            </label>
-            {selected.image_url && (
-              <div style={{marginBottom:8}}>
-                <img src={getImageUrl(selected.image_url)} alt='Preview' style={{maxWidth:'100%', maxHeight:220, border:'1px solid #ddd', borderRadius:6}} />
-              </div>
-            )}
-            <label style={{display:'block', marginBottom:8}}>
-              Specifications
-              <textarea value={selected.specifications} onChange={e => setSelected({...selected, specifications:e.target.value})} rows={4} style={{width:'100%', padding:6}} />
-            </label>
-            <label style={{display:'block', marginBottom:8}}>
-              Giá
-              <input type="number" value={selected.price} onChange={e => setSelected({...selected, price:e.target.value})} style={{width:'100%', padding:6}} />
-            </label>
-            <label style={{display:'block', marginBottom:8}}>
-              Inventory
-              <input type="number" value={selected.inventory} onChange={e => setSelected({...selected, inventory:e.target.value})} style={{width:'100%', padding:6}} />
-            </label>
-            <label style={{display:'block', marginBottom:8}}>
-              Active
-              <select value={selected.is_active} onChange={e => setSelected({...selected, is_active:e.target.value === 'true'})} style={{width:'100%', padding:6}}>
-                <option value={true}>True</option>
-                <option value={false}>False</option>
-              </select>
-            </label>
-            <div style={{display:'flex', gap:10}}>
-              <button onClick={saveProduct} disabled={saving}>{saving ? 'Đang lưu...' : 'Lưu'}</button>
-              <button onClick={clearForm} type="button">Reset</button>
+    <div className="container-fluid py-4">
+      <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+          <h3 className="mb-1 text-dark">Sản phẩm</h3>
+          {/* <p className="text-muted mb-0">Quản lý sản phẩm, tìm kiếm và lọc nhanh bằng Bootstrap.</p> */}
+        </div>
+        <button className="btn btn-outline-primary" onClick={loadProducts}>
+          Tải lại danh sách
+        </button>
+      </div>
+
+      <div className="card bg-light border-0 mb-4 shadow-sm">
+        <div className="card-body">
+          <div className="row g-3 align-items-end">
+            <div className="col-12 col-md-4">
+              <label className="form-label text-muted">Tìm theo tên</label>
+              <input
+                className="form-control"
+                placeholder="Nhập tên sản phẩm"
+                value={searchName}
+                onChange={e => setSearchName(e.target.value)}
+              />
+            </div>
+            <div className="col-6 col-md-2">
+              <label className="form-label text-muted">Giá min</label>
+              <input
+                className="form-control"
+                placeholder="0"
+                type="number"
+                min="0"
+                value={minPrice}
+                onChange={e => setMinPrice(e.target.value)}
+              />
+            </div>
+            <div className="col-6 col-md-2">
+              <label className="form-label text-muted">Giá max</label>
+              <input
+                className="form-control"
+                placeholder="0"
+                type="number"
+                min="0"
+                value={maxPrice}
+                onChange={e => setMaxPrice(e.target.value)}
+              />
+            </div>
+            <div className="col-12 col-md-2">
+              <button className="btn btn-primary w-100" onClick={loadProducts}>
+                Lọc
+              </button>
+            </div>
+            <div className="col-12 col-md-2 d-grid">
+              <button
+                className="btn btn-outline-secondary w-100"
+                type="button"
+                onClick={() => {
+                  setSearchName('')
+                  setMinPrice('')
+                  setMaxPrice('')
+                  loadProducts({ minPrice: '', maxPrice: '' })
+                }}
+              >
+                Xóa bộ lọc
+              </button>
             </div>
           </div>
         </div>
-        <div style={{flex:2, minWidth:400}}>
-          {loading ? <div>Loading...</div> : (
-            <table style={{width:'100%',borderCollapse:'collapse'}}>
-              <thead>
-                <tr style={{background:'#fafafa'}}>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Image</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Inv</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map(p => (
-                  <tr key={p.id} style={{borderTop:'1px solid #eee'}}>
-                    <td>{p.id}</td>
-                    <td>{p.name}</td>
-                    <td style={{padding:4}}>
-                      {p.image_url ? (
-                        <img src={getImageUrl(p.image_url)} alt={p.name} style={{width:60, height:60, objectFit:'cover', borderRadius:6}} />
-                      ) : '-'}
-                    </td>
-                    <td>{p.category || '-'}</td>
-                    <td>{p.price}</td>
-                    <td>{p.inventory}</td>
-                    <td>{String(p.is_active)}</td>
-                    <td>
-                      <button onClick={() => startEdit(p)} style={{marginRight:6}}>Edit</button>
-                      <button onClick={() => deleteProduct(p.id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+      </div>
+
+      {message && (
+        <div className={`alert ${message.includes('thành công') ? 'alert-success' : 'alert-danger'} py-2`} role="alert">
+          {message}
+        </div>
+      )}
+
+      <div className="row gx-4 gy-4">
+        <div className="col-12 col-xl-4">
+          <div className="card bg-white border-0 h-100 shadow-sm">
+            <div className="card-body">
+              <h4 className="card-title text-dark">{selected.id ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm mới'}</h4>
+              <p className="text-muted">Điền thông tin sản phẩm để lưu hoặc cập nhật.</p>
+
+              <div className="mb-3">
+                <label className="form-label text-muted">Tên sản phẩm</label>
+                <input
+                  className="form-control"
+                  value={selected.name}
+                  onChange={e => setSelected({ ...selected, name: e.target.value })}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label text-muted">Danh mục</label>
+                <input
+                  className="form-control"
+                  value={selected.category}
+                  onChange={e => setSelected({ ...selected, category: e.target.value })}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label text-muted">Mô tả</label>
+                <textarea
+                  className="form-control"
+                  value={selected.description}
+                  onChange={e => setSelected({ ...selected, description: e.target.value })}
+                  rows={3}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label text-muted">Upload ảnh sản phẩm</label>
+                <input
+                  className="form-control"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageFileChange}
+                />
+                {imageUploading && <div className="text-muted mt-2">Đang upload ảnh...</div>}
+              </div>
+
+              {selected.image_url && (
+                <div className="mb-3">
+                  <img
+                    src={getImageUrl(selected.image_url)}
+                    alt="Preview"
+                    className="img-fluid rounded"
+                    style={{ maxHeight: 220, objectFit: 'contain' }}
+                  />
+                </div>
+              )}
+
+              <div className="mb-3">
+                <label className="form-label text-muted">Thông số</label>
+                <textarea
+                  className="form-control"
+                  value={selected.specifications}
+                  onChange={e => setSelected({ ...selected, specifications: e.target.value })}
+                  rows={4}
+                />
+              </div>
+
+              <div className="row g-3 mb-3">
+                <div className="col-6">
+                  <label className="form-label text-muted">Giá</label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    value={selected.price}
+                    onChange={e => setSelected({ ...selected, price: e.target.value })}
+                  />
+                </div>
+                <div className="col-6">
+                  <label className="form-label text-muted">Tồn kho</label>
+                  <input
+                    className="form-control"
+                    type="number"
+                    value={selected.inventory}
+                    onChange={e => setSelected({ ...selected, inventory: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label text-muted">Trạng thái</label>
+                <select
+                  className="form-select"
+                  value={selected.is_active}
+                  onChange={e => setSelected({ ...selected, is_active: e.target.value === 'true' })}
+                >
+                  <option value={true}>True</option>
+                  <option value={false}>False</option>
+                </select>
+              </div>
+
+              <div className="d-flex gap-2 flex-wrap">
+                <button className="btn btn-success flex-grow-1" onClick={saveProduct} disabled={saving}>
+                  {saving ? 'Đang lưu...' : 'Lưu'}
+                </button>
+                <button className="btn btn-outline-secondary flex-grow-1" onClick={clearForm} type="button">
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-12 col-xl-8">
+          <div className="card bg-white border-0 h-100 shadow-sm">
+            <div className="card-body">
+              <div className="d-flex align-items-center justify-content-between mb-3">
+                <h4 className="card-title text-dark mb-0">Danh sách sản phẩm</h4>
+                <span className="badge bg-info text-dark">{filteredProducts.length} / {products.length}</span>
+              </div>
+
+              {loading ? (
+                <div className="text-dark">Loading...</div>
+              ) : (
+                <div className="table-responsive text-nowrap">
+                  <table className="table table-bordered table-hover align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Tên</th>
+                        <th>Ảnh</th>
+                        <th>Loại</th>
+                        <th>Giá</th>
+                        <th>Tồn kho</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredProducts.map(p => (
+                        <tr key={p.id}>
+                          <td>{p.id}</td>
+                          <td>{p.name}</td>
+                          <td style={{ width: 90 }}>
+                            {p.image_url ? (
+                              <img
+                                src={getImageUrl(p.image_url)}
+                                alt={p.name}
+                                style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 10 }}
+                              />
+                            ) : '-'}
+                          </td>
+                          <td>{p.category || '-'}</td>
+                          <td>{p.price?.toLocaleString('vi-VN') || 0}</td>
+                          <td>{p.inventory}</td>
+                          <td>
+                            <span className={`badge ${p.is_active ? 'bg-success' : 'bg-secondary'}`}>
+                              {p.is_active ? 'Đang bán' : 'Ngưng bán'}
+                            </span>
+                          </td>
+                          <td className="align-middle text-center">
+                            <div className="d-flex justify-content-center gap-2 flex-wrap">
+                              <button className="btn btn-sm btn-outline-secondary" onClick={() => startEdit(p)}>
+                                Sửa
+                              </button>
+                              <button className="btn btn-sm btn-danger" onClick={() => deleteProduct(p.id)}>
+                                Xóa
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

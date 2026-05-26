@@ -1,5 +1,4 @@
 import React from "react";
-import Header from "../../components/Header";
 import { useHomePage } from "./Homepage.hook";
 import ProductDetailDialog from "../../components/ProductDetailDialog";
 
@@ -13,6 +12,10 @@ export default function HomePage() {
     errorMsg,
     query,
     setQuery,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
     category,
     setCategory,
     sort,
@@ -30,7 +33,6 @@ export default function HomePage() {
 
   return (
     <>
-      <Header />
       <div className="container py-3">
       <div
         id="homeBannerCarousel"
@@ -102,38 +104,66 @@ export default function HomePage() {
            
           </div>
 
-          <div
-            className="d-flex flex-column flex-md-row gap-2"
-            style={{ minWidth: 320 }}
-          >
-            <input
-              className="form-control"
-              placeholder="Tìm theo tên..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-
-            <select
-              className="form-select"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              {categories.map((c) => (
-                <option key={c} value={c}>
-                  {c === "all" ? "Tất cả danh mục" : c}
-                </option>
-              ))}
-            </select>
-
-            <select
-              className="form-select"
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-            >
-              <option value="default">Sắp xếp</option>
-              <option value="price_asc">Giá tăng dần</option>
-              <option value="price_desc">Giá giảm dần</option>
-            </select>
+          <div className="card p-3 mb-3 shadow-sm">
+            <div className="row gy-2 gx-2 align-items-end">
+              <div className="col-12 col-md-4">
+                <label className="form-label mb-1">Tìm theo tên</label>
+                <input
+                  className="form-control"
+                  placeholder="Nhập tên sản phẩm..."
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+              <div className="col-6 col-md-2">
+                <label className="form-label mb-1">Giá từ</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  placeholder="0"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                />
+              </div>
+              <div className="col-6 col-md-2">
+                <label className="form-label mb-1">Giá đến</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  placeholder="0"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                />
+              </div>
+              <div className="col-6 col-md-2">
+                <label className="form-label mb-1">Danh mục</label>
+                <select
+                  className="form-select"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  {categories.map((c) => (
+                    <option key={c} value={c}>
+                      {c === "all" ? "Tất cả danh mục" : c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-6 col-md-2">
+                <label className="form-label mb-1">Sắp xếp</label>
+                <select
+                  className="form-select"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                >
+                  <option value="default">Mặc định</option>
+                  <option value="price_asc">Giá tăng dần</option>
+                  <option value="price_desc">Giá giảm dần</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -175,18 +205,30 @@ export default function HomePage() {
                   </div>
 
                   <div className="card-body d-flex flex-column">
-                    <div className="d-flex justify-content-between align-items-start gap-2">
-                      <h5 className="card-title mb-1">{getName(p)}</h5>
-                      <span className="badge text-bg-secondary">
+                    <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
+                      <div>
+                        <h5 className="card-title mb-1">{getName(p)}</h5>
+                        <p className="text-muted small mb-0">
+                          {p.description ? p.description.slice(0, 80) + (p.description.length > 80 ? "..." : "") : "Chưa có mô tả"}
+                        </p>
+                      </div>
+                      <span className="badge bg-secondary text-uppercase" style={{ fontSize: 11 }}>
                         {getCategory(p)}
                       </span>
                     </div>
 
-                    <div className="mt-2 mb-3">
+                    <div className="mb-3">
                       <div className="fs-5 fw-semibold text-primary">
                         {formatVND(getPrice(p))}
                       </div>
-                    
+                      <div className="d-flex flex-wrap gap-2 mt-2">
+                        <span className={`badge ${p.inventory > 0 ? "bg-success" : "bg-warning text-dark"}`}>
+                          {p.inventory > 0 ? `Còn ${p.inventory}` : "Hết hàng"}
+                        </span>
+                        <span className={`badge ${p.is_active ? "bg-info text-dark" : "bg-secondary"}`}>
+                          {p.is_active ? "Đang bán" : "Ngưng bán"}
+                        </span>
+                      </div>
                     </div>
 
                     <div className="mt-auto d-flex gap-2">

@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import Products from './Products'
-import Orders from './Orders'
 
 const Admin = () => {
-  const [tab, setTab] = useState('products')
   const [token, setToken] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -45,31 +43,53 @@ const Admin = () => {
   }
 
   return (
-    <div style={{padding:20}}>
-      <div style={{marginBottom:20, display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-        <div>
-          <button onClick={() => setTab('products')} style={{marginRight:8}}>Products</button>
-          <button onClick={() => setTab('orders')}>Orders</button>
+    <main className="admin-main px-4 py-4">
+      <div className="bg-white rounded-4 shadow-sm p-4 mb-4">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
+          <div className="d-flex gap-2 flex-wrap align-items-center">
+            {/* <span className="badge bg-primary text-white fs-6 py-2 px-3">Products</span> */}
+          </div>
+
+          {token ? (
+            <div className="d-flex gap-2 align-items-center flex-wrap">
+              <span className="badge bg-success text-dark">Admin logged in</span>
+              <button className="btn btn-outline-secondary" onClick={logout} type="button">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="d-flex flex-column flex-lg-row gap-2 align-items-stretch w-100 w-lg-auto admin-login-panel">
+              <input
+                className="form-control flex-grow-1"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="Email"
+                type="email"
+                style={{ minWidth: 0 }}
+              />
+              <input
+                className="form-control flex-grow-1"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Password"
+                type="password"
+                style={{ minWidth: 0 }}
+              />
+              <button
+                className="btn btn-primary btn-signin"
+                onClick={login}
+                disabled={loading}
+                type="button"
+              >
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </div>
+          )}
         </div>
-        {token ? (
-          <div>
-            <span style={{marginRight:12}}>Admin logged in</span>
-            <button onClick={logout}>Logout</button>
-          </div>
-        ) : (
-          <div style={{display:'flex', gap:8, alignItems:'center'}}>
-            <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Email" style={{padding:6}} />
-            <input value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" type="password" style={{padding:6}} />
-            <button onClick={login} disabled={loading}>{loading ? 'Signing in...' : 'Sign in'}</button>
-          </div>
-        )}
       </div>
-      {error && <div style={{color:'red', marginBottom:12}}>{error}</div>}
-      <div>
-        {tab === 'products' && <Products token={token} />}
-        {tab === 'orders' && <Orders token={token} />}
-      </div>
-    </div>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <Products token={token} />
+    </main>
   )
 }
 
