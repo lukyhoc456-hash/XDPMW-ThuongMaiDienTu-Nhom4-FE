@@ -31,7 +31,7 @@ export default function HomePage() {
   const handleAddToCart = async (product) => {
     const token = localStorage.getItem("token");
     //const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-    const API_URL = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
+    const API_URL = "https://xdpmw-thuongmaidientu-nhom4-be-1.onrender.com";
 
     if (token) {
       try {

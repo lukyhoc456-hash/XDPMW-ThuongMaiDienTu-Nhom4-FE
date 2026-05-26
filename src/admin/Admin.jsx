@@ -10,7 +10,7 @@ const Admin = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const API_BASE = import.meta.env.VITE_API_BASE || 'https://xdpmw-thuongmaidientu-nhom4-be.onrender.com'
+  const API_BASE = "https://xdpmw-thuongmaidientu-nhom4-be-1.onrender.com"
 
   const login = async () => {
     setError('')

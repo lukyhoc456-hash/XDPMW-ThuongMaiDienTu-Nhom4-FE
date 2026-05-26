@@ -8,7 +8,8 @@ export default function CartPage() {
   // Tùy theo code login của bác lưu token tên gì thì đổi ở đây nhé (VD: "token" hoặc "access_token")
   const token = localStorage.getItem("token");
   //const API_URL  || "http://localhost:8000";
-  const API_URL = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
+  //const API_URL = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
+  const API_URL = 'https://xdpmw-thuongmaidientu-nhom4-be-1.onrender.com';
   // Sửa lại cổng nếu FastAPI của bác chạy cổng khác
 
   // 2. LẤY DỮ LIỆU GIỎ HÀNG
