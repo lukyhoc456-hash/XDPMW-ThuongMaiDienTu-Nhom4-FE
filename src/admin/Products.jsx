@@ -168,8 +168,7 @@ export default function Products({ token }) {
     if (raw.startsWith('/img/')) return raw
     if (raw.startsWith('/static/')) return raw
     if (raw.startsWith('static/')) return `/${raw}`
-    if (raw.startsWith('uploads/')) return `${API_BASE.replace(/\/$/, '')}/${raw}`
-    return `${API_BASE.replace(/\/$/, '')}/static/uploads/${raw}`
+    return `/img/${raw}`
   }
 
   const filteredProducts = useMemo(() => {
