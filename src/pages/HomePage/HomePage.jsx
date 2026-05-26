@@ -73,6 +73,7 @@ export default function HomePage() {
 
   return (
     <>
+      <Header />
       <div className="container py-3">
         <div
           id="homeBannerCarousel"
