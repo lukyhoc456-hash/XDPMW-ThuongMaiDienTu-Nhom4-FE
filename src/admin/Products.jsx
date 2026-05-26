@@ -122,9 +122,15 @@ export default function Products({ token }) {
 
   const getImageUrl = url => {
     if (!url) return ''
-    if (url.startsWith('http://') || url.startsWith('https://')) return url
-    const prefix = API_BASE.replace(/\/$/, '')
-    return `${prefix}${url}`
+    const raw = String(url).trim().replaceAll('\\', '/')
+    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
+
+    const base = `${API_BASE.replace(/\/$/, '')}/`
+    try {
+      return new URL(raw.replace(/^\/+/, ''), base).href
+    } catch {
+      return `${base}${raw.replace(/^\/+/, '')}`
+    }
   }
 
   const filteredProducts = useMemo(() => {

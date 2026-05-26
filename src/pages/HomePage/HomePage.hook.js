@@ -43,7 +43,8 @@ export function useHomePage() {
         setErrorMsg("");
 
         const data = await getProducts();
-        const list = Array.isArray(data) ? data : data?.results ?? [];
+        let list = Array.isArray(data) ? data : data?.results ?? [];
+        list=list.filter(product=>product?.is_active===true)
 
         if (!cancelled) setProducts(list);
       } catch (err) {
