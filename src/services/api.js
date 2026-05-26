@@ -1,26 +1,27 @@
 // const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-const API_BASE = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
+//const API_BASE = "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com";
+const API_BASE = "https://xdpmw-thuongmaidientu-nhom4-be-1.onrender.com";
 
 
 export const getProducts = async () => {
-  const response = await fetch(`${API_BASE}/products`);
-  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-  const jsonResult = await response.json();
-  return jsonResult.data;
+    const response = await fetch(`${API_BASE}/products`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const jsonResult = await response.json();
+    return jsonResult.data;
 };
 
 export const getProduct = async (id) => {
     try {
-      const response = await fetch(`${API_BASE}/products/${id}`);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      
-      const jsonResult = await response.json();
-      return jsonResult.data; // Bóc tách dữ liệu gốc
+        const response = await fetch(`${API_BASE}/products/${id}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        const jsonResult = await response.json();
+        return jsonResult.data; // Bóc tách dữ liệu gốc
     } catch (error) {
-      console.error(`Error fetching product with id ${id}:`, error);
-      throw error;
+        console.error(`Error fetching product with id ${id}:`, error);
+        throw error;
     }
-  };
+};
 export const createProduct = async (productData) => {
     try {
         const response = await fetch(`${API_BASE}/products`, {
