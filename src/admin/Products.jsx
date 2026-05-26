@@ -67,7 +67,42 @@ export default function Products({ token }) {
     setMessage('')
   }
 
+  const validateProduct = () => {
+    const requiredFields = [
+      { value: selected.name, label: 'Tên sản phẩm' },
+      { value: selected.category, label: 'Danh mục' },
+      { value: selected.description, label: 'Mô tả' },
+      { value: selected.image_url, label: 'Ảnh sản phẩm' },
+      { value: selected.specifications, label: 'Thông số' },
+      { value: selected.price, label: 'Giá' },
+      { value: selected.inventory, label: 'Tồn kho' },
+    ]
+
+    for (const field of requiredFields) {
+      if (field.value === null || field.value === undefined || String(field.value).trim() === '') {
+        setMessage(`Vui lòng nhập ${field.label}.`)
+        return false
+      }
+    }
+
+    if (Number.isNaN(Number(selected.price)) || Number(selected.price) < 0) {
+      setMessage('Giá phải là một số hợp lệ và không được âm.')
+      return false
+    }
+
+    if (!Number.isInteger(Number(selected.inventory)) || Number(selected.inventory) < 0) {
+      setMessage('Tồn kho phải là một số nguyên hợp lệ và không được âm.')
+      return false
+    }
+
+    return true
+  }
+
   const saveProduct = async () => {
+    if (!validateProduct()) {
+      return
+    }
+
     setSaving(true)
     setMessage('')
     try {
