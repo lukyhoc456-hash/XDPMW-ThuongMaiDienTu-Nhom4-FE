@@ -121,20 +121,14 @@ export default function Products({ token }) {
   }
 
   const getImageUrl = url => {
-    if (!url) return ''
+    if (!url) return '/img/noimage.jpg'
     const raw = String(url).trim().replaceAll('\\', '/')
     if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
-
-    // Nếu URL ảnh nội bộ lưu dạng img/xxx hoặc /img/xxx thì dùng đường dẫn FE static
     if (raw.startsWith('img/')) return `/${raw}`
     if (raw.startsWith('/img/')) return raw
-
-    const base = `${API_BASE.replace(/\/$/, '')}/`
-    try {
-      return new URL(raw.replace(/^\/+/, ''), base).href
-    } catch {
-      return `${base}${raw.replace(/^\/+/, '')}`
-    }
+    if (raw.startsWith('/static/')) return raw
+    if (raw.startsWith('static/')) return `/${raw}`
+    return `/img/${raw}`
   }
 
   const filteredProducts = useMemo(() => {
@@ -417,6 +411,7 @@ export default function Products({ token }) {
                                 src={getImageUrl(p.image_url)}
                                 alt={p.name}
                                 style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 10 }}
+                                onError={(e) => { e.currentTarget.src = '/img/noimage.jpg' }}
                               />
                             ) : '-'}
                           </td>
