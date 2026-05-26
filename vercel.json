@@ -2,7 +2,11 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://xdpmw-thuongmaidientu-nhom4-be.onrender.com/:path*"
+            "destination": "https://xdpmw-thuongmaidientu-nhom4-be-1.onrender.com/:path*"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
         }
     ]
 }
