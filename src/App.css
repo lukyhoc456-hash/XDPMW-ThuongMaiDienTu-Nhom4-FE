@@ -74,7 +74,7 @@ select {
   padding: 16px 0;
 }
 
-..admin-login-panel input {
+.admin-login-panel input {
   min-width: 0;
   min-height: 48px;
 }
