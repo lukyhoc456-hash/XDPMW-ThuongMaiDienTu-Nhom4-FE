@@ -125,6 +125,10 @@ export default function Products({ token }) {
     const raw = String(url).trim().replaceAll('\\', '/')
     if (raw.startsWith('http://') || raw.startsWith('https://')) return raw
 
+    // Nếu URL ảnh nội bộ lưu dạng img/xxx hoặc /img/xxx thì dùng đường dẫn FE static
+    if (raw.startsWith('img/')) return `/${raw}`
+    if (raw.startsWith('/img/')) return raw
+
     const base = `${API_BASE.replace(/\/$/, '')}/`
     try {
       return new URL(raw.replace(/^\/+/, ''), base).href
