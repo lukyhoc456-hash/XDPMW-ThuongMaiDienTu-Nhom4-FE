@@ -25,7 +25,7 @@ const LoginPage = () => {
 
     // GỌI API GỬI THẲNG JSON LUÔN (Không dùng URLSearchParams hay FormData gì sất)
     axios
-      .post("http://localhost:8000/login", formData)
+      .post("https://xdpmw-thuongmaidientu-nhom4-be-1.onrender.com/login", formData)
       .then((response) => {
         console.log("Đăng nhập thành công:", response.data);
         

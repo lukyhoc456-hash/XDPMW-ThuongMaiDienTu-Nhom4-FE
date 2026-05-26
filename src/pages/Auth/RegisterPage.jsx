@@ -38,7 +38,7 @@ const RegisterPage = () => {
 
     // TODO: Thêm logic gọi API đăng ký tại đây
     axios
-      .post("https://xdpmw-thuongmaidientu-nhom4-be.onrender.com/register", formData)
+      .post("https://xdpmw-thuongmaidientu-nhom4-be-1.onrender.com/register", formData)
       .then((response) => {
         console.log("Đăng ký thành công:", response.data);
         // Xử lý kết quả thành công, ví dụ: chuyển hướng đến trang đăng nhập
