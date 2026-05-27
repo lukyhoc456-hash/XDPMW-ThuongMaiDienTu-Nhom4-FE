@@ -78,7 +78,7 @@ export default function Products({ token }) {
       { value: selected.category, label: 'Danh mục' },
       { value: selected.description, label: 'Mô tả' },
       { value: selected.image_url, label: 'Ảnh sản phẩm' },
-      { value: selected.specifications, label: 'Thông số' },
+      // { value: selected.specifications, label: 'Thông số' },
       { value: selected.price, label: 'Giá' },
       { value: selected.inventory, label: 'Tồn kho' },
     ]
@@ -116,7 +116,7 @@ export default function Products({ token }) {
         description: selected.description,
         category: selected.category,
         image_url: selected.image_url,
-        specifications: selected.specifications,
+        specifications: '',
         price: Number(selected.price),
         inventory: Number(selected.inventory),
         is_active: selected.is_active,
@@ -359,16 +359,6 @@ export default function Products({ token }) {
                   />
                 </div>
               )}
-
-              <div className="mb-3">
-                <label className="form-label text-muted">Thông số</label>
-                <textarea
-                  className="form-control"
-                  value={selected.specifications}
-                  onChange={e => setSelected({ ...selected, specifications: e.target.value })}
-                  rows={4}
-                />
-              </div>
 
               <div className="row g-3 mb-3">
                 <div className="col-6">
