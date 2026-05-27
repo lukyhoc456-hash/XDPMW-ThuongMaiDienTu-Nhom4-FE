@@ -12,26 +12,33 @@ export default function ProductDetailDialog({
 }) {
   if (!open) return null;
 
-  // Hàm parse text specifications thành object để hiển thị dạng bảng
   const specsObj = useMemo(() => {
     const s = product?.specifications;
     if (!s) return null;
-
+  
     if (typeof s === "object") return s;
-
+  
     if (typeof s !== "string") return null;
-
+  
     const result = {};
-    const lines = s.split("\n");
+    // Loại bỏ dấu ngoặc nhọn đầu và cuối nếu có
+    const cleanStr = s.replace(/^[{"\s]+|[}";\s]+$/g, "").trim();
+    const lines = cleanStr.split(/[\n,]/);
     
     for (const line of lines) {
+      if (!line.trim()) continue;
+      
       const colonIndex = line.indexOf(":");
-      if (colonIndex === -1) continue;
+      const tabIndex = line.indexOf("\t");
+      const separatorIndex = colonIndex !== -1 ? colonIndex : tabIndex;
       
-      const key = line.substring(0, colonIndex).trim().toLowerCase();
-      const value = line.substring(colonIndex + 1).trim();
+      if (separatorIndex === -1) continue;
       
-      // Map key tiếng Việt sang key tiếng Anh để dùng prettifyKey
+      const key = line.substring(0, separatorIndex).trim().toLowerCase().replace(/^["'{}\s]+|["'{}\s]+$/g, "");
+      const value = line.substring(separatorIndex + 1).trim().replace(/^["'{}\s]+|["'{}\s]+$/g, "");
+      
+      if (!key || !value) continue;
+      
       const keyMap = {
         "cpu": "cpu",
         "ram": "ram",
